@@ -1,11 +1,12 @@
-program Heladeria;
+program TpSeleccion_Figueroa;
 
 var
-    Peso    : real;   { Unidad de Medida: Kgs  }
-    Importe : real;   { Almacena el Importe    }
-    Desc    : real;   { Almacena el Descuento  }
+    Peso    : real;   { Unidad de Medida: Kgs                  }
+    Precio  : real;   { Almacena el Importe del TIPO de helado }
+    Importe : real;   { Almacena Peso*Precio                   }
+    Desc    : real;   { Almacena el Descuento                  }
 
-    Tipo    : char;   { A:Agua L:Leche C:Crema }
+    Tipo    : char;   { A:Agua L:Leche C:Crema                 }
 
 begin
     Peso := 0;
@@ -26,7 +27,7 @@ begin
 {---ENTRADA DE DATO: TIPO------------------------------------------------------}
 
     WriteLn();
-    WriteLn('TIPOS de helado');
+    WriteLn('TIPOS de helado:');
 
     WriteLn('  "A" : Agua.');
     WriteLn('  "L" : Leche.');
@@ -58,34 +59,49 @@ begin
         {Asignación de los Precios}
 
     Case Tipo of
-        'A' : Importe := 2000;  { Agua  }
+        'A' : Precio := 2000;  { Agua  }
 
-        'L' : Importe := 2300;  { Leche }
+        'L' : Precio := 2300;  { Leche }
 
-        'C' : Importe := 2500;  { Crema }
+        'C' : Precio := 2500;  { Crema }
 
     end; {Case}
 
+        {Calculo de Importe General: Importe antes del Descuento}
+
+    Importe := Peso * Precio;
+
 {--------SALIDA DE INFORMACIÓN-------------------------------------------------}
 
-        {Muestra del Importe Final}
+        {Muestra del Detalle e IMPORTE A PAGAR}
 
-    Writeln('Importe Final: $ ', Peso * Importe * (1 - Desc):9:2); 
+    writeln();
+    WriteLn(' Detalle de la compra: ');
+    WriteLn('  Importe General: ',Peso:6:3, ' kg. x $ ', Precio:7:2, ' = $ ', (Importe):8:2);
+    if (not(Desc = 0)) then
+        //WriteLn('  Descuento      : ',(Desc*100):5:2, '  %   x $ ', (Peso * Importe):8:2, ' = $ ', -(Peso * Importe * Desc):8:2)
+        WriteLn('  Aplica un Descuento del: ',(Desc*100):5:2, ' %        = $ ', -(Importe * Desc):8:2)
+    else
+        writeln('  A partir de 1.5 kg participa de grandes descuentos!');
+        writeln('                                           ------------');
+        writeln('  IMPORTE A PAGAR:                          $ ', ((Importe) - (Importe*Desc)):8:2);
 
-    ReadLn(); {Evita el cierre de la ventana}
-end.
+    ReadLn(); {para generar una espera y ver poder la impresión de la pantalla}
+
+end. {Fin del programa.}
+
 
 // Dos juegos de datos de entrada con las salidas obtenidas
 
- {     |-----------------------------------------||-------------|     }
- {     |   ENTRADA:        PESO         TIPO     ||    SALIDA   |     }
- {     |-----------------------------------------||-------------|     }
- {     |   JUEGO 1:       1.750            L     ||   3823.75   |     }
- {     |-----------------------------------------||-------------|     }
- {     |   JUEGO 2:       4.500            C     ||  10462.50   |     }
- {     |-----------------------------------------||-------------|     }
-
-
+{      |-----------------------------------------||-------------|     }
+{      |   ENTRADA:        PESO         TIPO     ||    SALIDA   |     }
+{      |-----------------------------------------||-------------|     }
+{      |-----------------------------------------||-------------|     }
+{      |   JUEGO 1:       1.750            L     ||   3823.75   |     }
+{      |-----------------------------------------||-------------|     }
+{      |-----------------------------------------||-------------|     }
+{      |   JUEGO 2:       4.500            C     ||  10462.50   |     }
+{      |-----------------------------------------||-------------|     }
 
 
 
@@ -110,11 +126,3 @@ end.
 
 // si el peso es más de 5 Kg
 //     se aplica un descuento del 10% sobre el valor a pagar.
-
-
-
-
-
-
-
-
