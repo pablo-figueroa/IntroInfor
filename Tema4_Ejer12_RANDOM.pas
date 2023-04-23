@@ -75,26 +75,6 @@ clrscr();
 
     { GENERAR LISTA DE VENTAS RANDOM }
 
-
-
-    //repeat
-    //    Write('Devoluciones de Ventas (Max: 5): ');
-    //    Readln(Negativos);
-    //    if (Negativos > 5) then
-    //        begin
-    //        gotoxy((50-16),6);
-    //        clreol();
-    //        TextColor(red);
-    //        Write('Dato NO Válido');
-    //        TextColor(white);
-    //        ReadLn(); { Establecer una pausa }
-    //        gotoxy(1,6);
-    //        clreol();
-    //        end;
-    //until (Negativos <= 5);
-    //
-    //Positivos := 40 - Negativos;
-
     Randomize;
     Positivos := (Random(7) + 1)*5;
     Negativos := (Random(1) + 1)*5;
@@ -105,16 +85,12 @@ clrscr();
     WriteLn('  Devoluciones   : ', Negativos:2);
     WriteLn('  TOTAL Elementos: ', (Positivos + Negativos):2);
 
-
-
-
     ReWrite(arch);
     for i:=1 to Positivos do
         begin
         NumAlea := Random(5000) + 1;
         Writeln(arch, NumAlea);
         end;
-
 
     for j:=1 to (Negativos) do
         begin
