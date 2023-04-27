@@ -108,7 +108,8 @@ begin
 
         end; {while}
 
-
+    Close(arch);
+    
     WriteLn('LECTURA DESDE ARCHIVO: "jabalina.txt"');
     WriteLn();
 
