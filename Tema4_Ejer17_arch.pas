@@ -25,13 +25,13 @@ Debería responder
 
 program T4Ej17;
 
-{$codepage UTF8}
+//{$codepage UTF8}
 
 uses crt;
 
 var
     CantSort, NumSort, i, j, MaxPar, MaxParSort1, MaxParSort2, MaxParSort3, MaxParSort4, MaxParSort5 : byte;
-
+    
     Impar : boolean;
 
     arch : text;
@@ -85,7 +85,8 @@ repeat
 
         end; {for 1toCantSort}
 
-
+    close(arch);
+    
     WriteLn();
 
     { SALIDA DE INFORMACION}
@@ -131,11 +132,12 @@ repeat
     else
         if CantSort >= 5 then
             WriteLn('No hubo pares en el Sorteo N°: 5');
-
+    
     WriteLn();
     TextColor(green);
     Write('ENTER para reiniciar...');
     TextColor(white);
+    
     ReadLn();
     
 until FALSE;
