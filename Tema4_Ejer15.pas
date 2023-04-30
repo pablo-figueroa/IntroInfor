@@ -31,7 +31,7 @@
 
 program T4Ej15;
 
-//{$codepage UTF8}
+{$codepage UTF8}
 
 uses crt;
 
@@ -72,8 +72,9 @@ clrscr();
 
     TextColor(yellow);
     WriteLn('INGRESAR los siguientes DATOS:');
-    WriteLn();
+    TextColor(white);
 
+    TextColor(yellow);
     Write('  Nombre: ');
     TextColor(white);
     ReadLn(Nom);
@@ -81,10 +82,15 @@ clrscr();
 
     While (Nom <> '***') do
         begin
-        Write('  Velocidad Máxima: ');
-        ReadLn(VelMax);
-        Write('  Pulsaciones por minutos: ');
-        ReadLn(Pulso);
+        repeat
+            Write('  Velocidad Máxima: ');
+            ReadLn(VelMax);
+        until (VelMax > 0);
+
+        repeat
+            Write('  Pulsaciones por minutos: ');
+            ReadLn(Pulso);
+        until (Pulso > 0);
 
         { ACUMADOR DE VELOCIDAD MÁXIMA }
         AcumVelMax := AcumVelMax + VelMax;
@@ -161,12 +167,9 @@ clrscr();
     TextColor(white);
 
     reset(arch);
-    while not eof(arch) do
+    ReadLn(arch, Nom);
+    while Nom <> '***' do
         begin
-
-        ReadLn(arch, Nom);
-        if Nom = '***' then
-            Break;
 
         ReadLn(arch, Cat);
         ReadLn(arch, NivR);
@@ -176,9 +179,10 @@ clrscr();
         Write('CICLISTA: ');
         TextColor(White);
         WriteLn(Nom);
-
         Writeln('  Categoria       : ', Cat);
         Writeln('  Nivel de Riesgo : ', NivR);
+
+        ReadLn(arch, Nom);
         end; {while}
     close(arch);
 
