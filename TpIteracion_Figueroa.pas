@@ -1,422 +1,170 @@
-program TpIterativo_FIGUEROA;
+(*
 
-{$codepage UTF8} { Para no tener inconvenientes con acentos }
+Una panadería vende sus productos por Kg., a los
+siguientes valores:
+    *Pan: $ 500
+    *Masas: $ 1000
+    *Tortas: $ 1500
 
-uses crt, SysUtils;
+Al final del día desea procesar todas las ventas realizadas, por cada una ingresa:
+     Código de Producto: (P-Pan, M-Masas, T-Tortas, *-Fin de datos)
+     Peso de la venta
+     Tipo de Pago (E-Efectivo, T-Tarjeta)
+
+Se pide leer todos los datos correspondientes a las ventas desde el archivo
+“Panaderia.txt”, calcular e informar:
+    a- Porcentaje de ventas en el día, efectivo y tarjeta por separado, sobre la
+cantidad total de ventas.
+    b- Cantidad de kilos de pan, de masas y de tortas, por separado.
+    c- Importe de la venta máxima, aclarando si fue en efectivo o con tarjeta.
+
+        MODELO panaderia.txt
+            T 1 E
+            M 2 E
+            T 1.5 T
+            P 2 E
+            M 1.5 E
+            T 3 T
+            P 1 T
+            *
+
+*)
+(*
+Se pide leer todos los datos correspondientes a las ventas desde el archivo “Panaderia.txt”, calcular e informar:
+    a- Porcentaje de ventas en el día, efectivo y tarjeta por separado, sobre la
+cantidad total de ventas.
+    b- Cantidad de kilos de pan, de masas y de tortas, por separado.
+    c- Importe de la venta máxima, aclarando si fue en efectivo o con tarjeta.
+*)
+
+program Panaderia2;
 
 var
-    Ruta, Path, PagoE : string;
-
     arch : text;
 
-    Res, Pago, Cod : char;
+    AcumkiloPan, AcumkiloMasas, AcumkiloTortas,
+    VtaMaxImporte, PesoVta : real;
 
-    Peso, MaxVentaE, MaxVentaT, AcumPesoPE, AcumPesoME, AcumPesoTE,
-    AcumPesoPT, AcumPesoMT, AcumPesoTT : single;
+    VtaMaxTipoPago : string;
 
-    ContE, ContPE, ContME, ContTE, ContT, ContPT, ContMT, ContTT : byte;
+    CodProd, TipoPago, aux : char;
 
-
-    {Ruta       : La que ingresa el usuario }
-    {Path       : Ruta + Archivo            }
-
-    {Res        : Respuesta a la pregunta sobre ubicación del archivo }
-
-    {Cod        : Código del producto    }
-    {Peso       : Peso de la Venta en kg }
-    {Pago       : Tipo de pago           }
-    {PagoE      : Para poder leer el Tipo de Pago; ej lee: ' E' }
-                { Con char me daba error 106                    }
-                { Luego Trim() le quita el espacio: 'E'         }
-
-    {MaxVentaE  : Almacena la Venta Maxima en Efectivo }
-    {MaxVentaT  : Almacena la Venta Maxima en Tarjeta  }
-
-    {AcumPesoPE : Acumula los Kilos vendidos en Pan    en Efectivo }
-    {AcumPesoME : Acumula los Kilos vendidos en Masas  en Efectivo }
-    {AcumPesoTE : Acumula los Kilos vendidos en Tortas en Efectivo }
-
-    {AcumPesoPT : Acumula los Kilos vendidos en Pan    con Tarjeta }
-    {AcumPesoMT : Acumula los Kilos vendidos en Masas  con Tarjeta }
-    {AcumPesoTT : Acumula los Kilos vendidos en Tortas con Tarjeta }
-
-    {ContE      : Cuenta las ventas en Efectivo           }
-    {ContPE     : Cuenta las ventas de Pan    en Efectivo }
-    {ContME     : Cuenta las ventas de Masas  en Efectivo }
-    {ContTE     : Cuenta las ventas de Tortas en Efectivo }
-
-    {ContT      : Cuenta las ventas con Tarjeta           }
-    {ContPT     : Cuenta las ventas de Pan    con Tarjeta }
-    {ContMT     : Cuenta las ventas de Masas  con Tarjeta }
-    {ContTT     : Cuenta las ventas de Tortas con Tarjeta }
-
-
-
-
-
+    ContVtaEfe, ContVtaTar : byte;
 
 begin
+    AcumkiloPan    := 0;
+    AcumkiloMasas  := 0;
+    AcumkiloTortas := 0;
 
-  repeat
+    ContVtaEfe     := 0;
+    ContVtaTar     := 0;
 
-    { TITULO }
+    VtaMaxImporte := 0; { Valor Irrisorio. Si la Venta es cero es porque no hubo venta. }
 
-    clrscr();
-    TextColor(green);
-    WriteLn('------------------------------------------------------');
-    WriteLn('   PANADERIA - UBICACIÓN DEL ARCHIVO: panaderia.txt');
-    WriteLn('------------------------------------------------------');
-    WriteLn();
-    TextColor(white);
-    { UBICACION DEL ARCHIVO }
+    assign(arch, 'Panaderia.txt');
+
+    WriteLn('-----------');
+    WriteLn('V E N T A S');
+    WriteLn('-----------');
+
+    rewrite(arch);
+
     repeat
-        Write('¿El archivo Panaderia.txt está alojado en la misma carpeta que el ".pas"? (S | N): ');
-        ReadLn(Res);
-        Res := UpCase(Res);
-    until (Res = 'S') or (Res = 'N');
-    WriteLn();
+        Write('Codigo de Producto: (P-Pan, M-Masas, T-Tortas, *-Fin de datos): ');
+        ReadLn(CodProd);
+        CodProd := UpCase(CodProd);
+    until (CodProd = 'P') or (CodProd = 'M') or (CodProd = 'T') or (CodProd = '*');
+    Write(arch, CodProd);
+    Write(arch, ' ');
 
-    if Res = 'N' then
+
+    while CodProd <> '*' do
         begin
-        Write('  Introduzca la RUTA COMPLETA ( Ejemplo: c:\carpeta\carpeta\ ) : ');
-        ReadLn(Ruta);
-        end;
+            repeat
+                Write('Peso de la venta: ');
+                ReadLn(PesoVta);
+            until (PesoVta > 0);
+            Write(arch, PesoVta:0:3);
+            Write(arch, ' ');
 
+            repeat
+                Write('Tipo de Pago (E-Efectivo, T-Tarjeta): ');
+                ReadLn(TipoPago);
+                TipoPago := UpCase(TipoPago);
+            until (TipoPago = 'E') or (TipoPago = 'T');
+            WriteLn(arch, TipoPago);
 
-    { TITULO }
-    clrscr();
-    TextColor(white);
-    WriteLn('------------------------');
-    WriteLn('   PANADERIA - VENTAS');
-    WriteLn('------------------------');
-    WriteLn();
-
-
-    { DECISIÓN DEL PATH }
-    if Res = 'N' then
-        Path := concat(Ruta, 'Panaderia.txt')
-    else
-        Path := 'Panaderia.txt';
-
-
-    { ASIGNACIÓN Y PREPARACIÓN DE ARCHIVO }
-    assign (arch, Path);
-    ReWrite(arch); { Preparación del Archivo para Escritura}
-
-
-    { COMIENZAN LAS VENTAS }
-    repeat
-        gotoxy(1,5);
-        clreol();
-        Write('Ingresar CODIGO del Producto [ P | M | T ]: ');
-        ReadLn(Cod);
-        Cod := UpCase(Cod);
-
-    until (Cod = 'P') or (Cod = 'M') or (Cod = 'T');
-
-
-    { INICIO DEL CICLO DE VENTAS }
-    while (Cod = 'P') or (Cod = 'M') or (Cod = 'T') do
-        begin
-
-        { TITULO }
-        clrscr();
-        WriteLn('------------------------');
-        WriteLn('   PANADERIA - VENTAS');
-        WriteLn('------------------------');
-        WriteLn();
-        case Cod of
-            'P' :
-                begin
-                Write(arch, Cod);      { Escritura en Archivo}
-                Write(arch, ' ');      { Escritura en Archivo}
-
-                repeat
-                    gotoxy(1,5);
-                    clreol();
-                    Write('PAN - Peso en kgs : ');
-                    ReadLn(Peso);
-                until Peso > 0;
-                Write(arch, Peso:0:1); { Escritura en Archivo}
-
-                repeat
-                    gotoxy(1,6);
-                    clreol();
-                    Write('    - Tipo de Pago [E|T]: ');
-                    ReadLn(Pago);
-                    Pago := UpCase(Pago);
-                until (Pago = 'E') or (Pago = 'T');
-                Write(arch, ' ');      { Escritura en Archivo}
-                WriteLn(arch, Pago);   { Escritura en Archivo}
-
-                end;
-
-            'M' :
-                begin
-                Write(arch, Cod);      { Escritura en Archivo}
-                Write(arch, ' ');      { Escritura en Archivo}
-
-                repeat
-                    gotoxy(1,5);
-                    clreol();
-                    Write('MASAS - Peso en kgs : ');
-                    ReadLn(Peso);
-                until Peso > 0;
-                Write(arch, Peso:0:1); { Escritura en Archivo}
-
-                repeat
-                    gotoxy(1,6);
-                    clreol();
-                    Write('      - Tipo de Pago [E|T]: ');
-                    ReadLn(Pago);
-                    Pago := UpCase(Pago);
-                until (Pago = 'E') or (Pago = 'T');
-                Write(arch, ' ');      { Escritura en Archivo}
-                WriteLn(arch, Pago);   { Escritura en Archivo}
-
-                end;
-
-            'T' :
-                begin
-                Write(arch, Cod);      { Escritura en Archivo}
-                Write(arch, ' ');      { Escritura en Archivo}
-
-                repeat
-                    gotoxy(1,5);
-                    clreol();
-                    Write('TORTAS - Peso en kgs : ');
-                    ReadLn(Peso);
-                until Peso > 0;
-                Write(arch, Peso:0:1); { Escritura en Archivo}
-
-                repeat
-                    gotoxy(1,6);
-                    clreol();
-                    Write('       - Tipo de Pago [E|T]: ');
-                    ReadLn(Pago);
-                    Pago := UpCase(Pago);
-                until (Pago = 'E') or (Pago = 'T');
-                Write(arch, ' ');      { Escritura en Archivo}
-                WriteLn(arch, Pago);   { Escritura en Archivo}
-
-                end;
-
-        end; {case of}
-
-        WriteLn();
-
-        repeat
-            clrscr();
-            WriteLn('------------------------');
-            WriteLn('   PANADERIA - VENTAS');
-            WriteLn('------------------------');
-            WriteLn();
-
-            Write('Ingresar CODIGO del Producto [ P | M | T | * ] : ');
-            ReadLn(Cod);
-            Cod := UpCase(Cod);
-            if cod = '*' then
-                begin
-                TextColor(red);
-                WriteLn('  ADVERTENCIA! Si CONFIRMA esta solicitud se CERRARÁ la CAJA del día');
-                repeat
-                    Write('  CONFIRMA "*" ? | N: ');
-                    ReadLn(Cod);
-                    Cod := UpCase(Cod);
-                until (Cod = '*') or (Cod = 'N');
-                TextColor(white);
-                WriteLn();
-                end; {if}
-        until (Cod = 'P') or (Cod = 'M') or (Cod = 'T') or (Cod = '*');
-
+            Writeln();
+            repeat
+                Write('Codigo de Producto: (P-Pan, M-Masas, T-Tortas, *-Fin de datos): ');
+                ReadLn(CodProd);
+                CodProd := UpCase(CodProd);
+            until (CodProd = 'P') or (CodProd = 'M') or (CodProd = 'T') or (CodProd = '*');
+            Write(arch, CodProd);
+            Write(arch, ' ');
         end; {while}
+
     close(arch);
 
 
-
-
-
-
-    { INICIALIZACION DE CONTADORES }
-
-    AcumPesoPE := 0;
-    AcumPesoME := 0;
-    AcumPesoTE := 0;
-
-    AcumPesoPT := 0;
-    AcumPesoMT := 0;
-    AcumPesoTT := 0;
-
-    ContE      := 0;
-    ContPE     := 0;
-    ContME     := 0;
-    ContTE     := 0;
-
-    ContT      := 0;
-    ContPT     := 0;
-    ContMT     := 0;
-    ContTT     := 0;
-
-    MaxVentaE  := 0;
-    MaxVentaT  := 0;
-
-    { PREPARACIÓN DE ARCHIVO PARA LECTURA }
-    assign(arch, Path);
+    { LECTURA Y PROCESAMIENTO DE ARCHIVO }
     reset(arch);
 
-    { PROCESO }
+    ReadLn(arch, CodProd,PesoVta,aux,TipoPago);
 
+    while CodProd <> '*' do
+        begin
 
-    while not eof(arch) do
-    begin
-    ReadLn(arch, Cod,Peso,PagoE);
-    PagoE := Trim(PagoE);
-
-    case Cod of
-        'P' :
-            begin
-
-            if PagoE = 'E' then
+        if CodProd = 'P' then
+            AcumKiloPan := AcumKiloPan + PesoVta;
+            if ((PesoVta * 500) > VtaMaxImporte) then
                 begin
-                ContPE := ContPE + 1;
-                ContE  := ContE  + 1;
-                AcumPesoPE := AcumPesoPE + Peso;
-                if MaxVentaE < (Peso * 500) then
-                    MaxVentaE := Peso * 500;
-                end
-            else
-                begin
-                ContPT := ContPT + 1;
-                ContT  := ContT  + 1;
-                AcumPesoPT := AcumPesoPT + Peso;
-                if MaxVentaT < (Peso * 500) then
-                    MaxVentaT := Peso * 500;
+                VtaMaxImporte := PesoVta * 500;
+                VtaMaxTipoPago := TipoPago;
                 end;
-            end; {'P'}
 
-
-        'M' :
-            begin
-
-            if PagoE = 'E' then
+        if CodProd = 'M' then
+            AcumKiloMasas := AcumKiloMasas + PesoVta;
+            if ((PesoVta * 1000) > VtaMaxImporte) then
                 begin
-                ContME := ContME + 1;
-                ContE  := ContE  + 1;
-                AcumPesoME := AcumPesoME + Peso;
-                if MaxVentaE < (Peso * 1000) then
-                    MaxVentaE := Peso * 1000;
-                end
-            else
-                begin
-                ContMT := ContMT + 1;
-                ContT  := ContT  + 1;
-                AcumPesoMT := AcumPesoMT + Peso;
-                if MaxVentaT < (Peso * 1000) then
-                    MaxVentaT := Peso * 1000;
+                VtaMaxImporte := PesoVta * 1000;
+                VtaMaxTipoPago := TipoPago;
                 end;
-            end; {'M'}
-
-
-
-        'T' :
-            begin
-
-            if PagoE = 'E' then
+        if CodProd = 'T' then
+            AcumKiloTortas := AcumKiloTortas + PesoVta;
+            if ((PesoVta * 1500) > VtaMaxImporte) then
                 begin
-                ContTE := ContTE + 1;
-                ContE  := ContE  + 1;
-                AcumPesoTE := AcumPesoTE + Peso;
-                if MaxVentaE < (Peso * 1500) then
-                    MaxVentaE := Peso * 1500;
-                end
-            else
-                begin
-                ContTT := ContTT + 1;
-                ContT  := ContT  + 1;
-                AcumPesoTT := AcumPesoTT + Peso;
-                if MaxVentaT < (Peso * 1500) then
-                    MaxVentaT := Peso * 1500;
+                VtaMaxImporte := PesoVta * 1500;
+                VtaMaxTipoPago := TipoPago;
                 end;
-            end; {'T'}
 
-    end; { case }
-    end; { while }
+        if TipoPago = 'E' then
+            ContVtaEfe := ContVtaEfe + 1
+        else
+            ContVtaTar := ContVtaTar + 1;
+
+        ReadLn(arch, CodProd,PesoVta,aux,TipoPago);
+        end; {while}
+
+
     close(arch);
-
-
-
-    { SALIDA DE INFORMACIÓN }
-
-    { TITULO }
-    clrscr();
-    TextColor(green);
-    WriteLn('-------------------------------');
-    WriteLn('  PANADERIA - INFORME DEL DIA');
-    WriteLn('-------------------------------');
-
-    { a- Porcentaje de ventas en el día, efectivo y tarjeta por separado }
-    TextColor(green);
-    WriteLn('-------------------------------');
-    TextColor(white);
-    WriteLn('PORCENTAJES DE VENTAS');
-    WriteLn();
-    WriteLn('  TOTAL EN EFECTIVO :  ', ((ContE / (ContE + ContT)) * 100):6:2);
-    WriteLn('  TOTAL CON TARJETA :  ', ((ContT / (ContE + ContT)) * 100):6:2);
-    WriteLn();
-    WriteLn('           EFECTIVO | TARJETA ');
-
-    if (ContPE > 0) or (ContPT > 0) then
-        WriteLn('  PAN    :   ',((ContPE / (ContPE + ContPT)) * 100):6:2,' |  ',((ContPT / (ContPE + ContPT)) * 100):6:2);
-
-    if (ContME > 0) or (ContMT > 0) then
-        WriteLn('  MASAS  :   ',((ContME / (ContME + ContMT)) * 100):6:2,' |  ',((ContMT / (ContME + ContMT)) * 100):6:2);
-
-    if (ContTE > 0) or (ContTT > 0) then
-        WriteLn('  TORTAS :   ',((ContTE / (ContTE + ContTT)) * 100):6:2,' |  ',((ContTT / (ContTE + ContTT)) * 100):6:2);
-
-    TextColor(green);
-    WriteLn('-------------------------------');
-    TextColor(white);
-
-    { b- Cantidad de kilos de pan, de masas y de tortas, por separado. }
-    TextColor(green);
-    WriteLn('-------------------------------');
-    TextColor(white);
-    WriteLn('CANTIDAD DE KILOS VENDIDOS:');
-    WriteLn();
-    WriteLn('           EFECTIVO | TARJETA ');
-
-    if (AcumPesoPE > 0) or (AcumPesoPT > 0) then
-        WriteLn('  PAN    :  ',AcumPesoPE:7:1,' | ',AcumPesoPT:7:1);
-
-    if (AcumPesoME > 0) or (AcumPesoMT > 0) then
-        WriteLn('  MASAS  :  ',AcumPesoME:7:1,' | ',AcumPesoMT:7:1);
-
-    if (AcumPesoTE > 0) or (AcumPesoTT > 0) then
-        WriteLn('  TORTAS :  ',AcumPesoTE:7:1,' | ',AcumPesoTT:7:1);
-    TextColor(green);
-    WriteLn('-------------------------------');
-    TextColor(white);
-
-    { c- Importe de la venta máxima, aclarando si fue en efectivo o con tarjeta. }
-    TextColor(green);
-    WriteLn('-------------------------------');
-    TextColor(white);
-    WriteLn('IMPORTE DE LA VENTA MÁXIMA:');
-    WriteLn();
-    if MaxVentaE > MaxVentaT then
-        WriteLn('  IMPORTE: ',MaxVentaE:8:2,' | EFECTIVO')
-    else
-        WriteLn('  IMPORTE: ',MaxVentaT:8:2,' | TARJETA');
-    TextColor(green);
-    WriteLn('-------------------------------');
-    TextColor(white);
+    { SALIDAS DE INFORMACIÓN }
 
     WriteLn();
-    TextColor(green);
-    Write('ENTER para reiniciar...');
-    TextColor(white);
+    WriteLn('a- Porcentaje de ventas en el dia, efectivo y tarjeta por separado, sobre la cantidad total de ventas.');
+    WriteLn('  Porcentaje de Ventas en Efectivo: ', (ContVtaEfe * 100 / (ContVtaEfe + ContVtaTar)):0:2);
+    WriteLn('  Porcentaje de Ventas en Tarjeta : ', (ContVtaTar * 100 / (ContVtaEfe + ContVtaTar)):0:2);
+
+    WriteLn();
+    WriteLn('b- Cantidad de kilos de pan, de masas y de tortas, por separado.');
+    WriteLn('  Kilos Vendidos de Pan   : ', AcumkiloPan   :5:1);
+    WriteLn('  Kilos Vendidos de Masas : ', AcumkiloMasas :5:1);
+    WriteLn('  Kilos Vendidos de Tortas: ', AcumkiloTortas:5:1);
+
+    WriteLn();
+    WriteLn('c- Importe de la venta maxima, aclarando si fue en efectivo o con tarjeta.');
+    WriteLn('  Venta Maxima: ', VtaMaxImporte:8:2, ' | Tipo de Pago: ', VtaMaxTipoPago);
+
     readln();
 
-until FALSE;
 end.
