@@ -38,10 +38,11 @@ uses crt;
 var
   Nom : string[20];
 
-  VelMax, Pulso,
   ContCatA, ContCatB, ContCatC,
   ContR1, ContR2, ContR3,
   AcumVelMax, ContA1 : byte;
+
+  VelMax, Pulso : word;  { Pulso: Para poder validar, con byte si se ingresa 258 => 1 }
 
   arch: text;
 
@@ -61,7 +62,7 @@ clrscr();
     AcumVelMax := 0;
     ContA1     := 0;
 
-    TextColor(blue);
+    TextColor(cyan);
     Writeln('----------------------------------');
     Writeln('        PRUEBA DE CICLISMO');
     Writeln('----------------------------------');
@@ -85,12 +86,12 @@ clrscr();
         repeat
             Write('  Velocidad Máxima: ');
             ReadLn(VelMax);
-        until (VelMax > 0);
+        until (VelMax > 0) and (VelMax < 300);
 
         repeat
             Write('  Pulsaciones por minutos: ');
             ReadLn(Pulso);
-        until (Pulso > 0);
+        until (Pulso > 0) and (Pulso < 250);
 
         { ACUMADOR DE VELOCIDAD MÁXIMA }
         AcumVelMax := AcumVelMax + VelMax;
@@ -118,25 +119,50 @@ clrscr();
                 end;
 
         { NIVEL DE RIESGO }
-        if pulso <= 120 then
-            begin
-            WriteLn('    Nivel de Riesgo: 1');
-            ContR1 := ContR1 + 1;
-            Writeln(arch, '1');
-            end
-        else
-            if pulso <= 160 then
+        //if pulso <= 120 then
+        //    begin
+        //    WriteLn('    Nivel de Riesgo: 1');
+        //    ContR1 := ContR1 + 1;
+        //    Writeln(arch, '1');
+        //    end
+        //else
+        //    if pulso <= 160 then
+        //        begin
+        //        WriteLn('    Nivel de Riesgo: 2');
+        //        ContR2 := ContR2 + 1;
+        //        Writeln(arch, '2');
+        //        end
+        //    else
+        //        begin
+        //        WriteLn('    Nivel de Riesgo: 3');
+        //        ContR3 := ContR3 + 1;
+        //        Writeln(arch, '3');
+        //        end;
+
+        case pulso of
+            1..120:
+                begin
+                WriteLn('    Nivel de Riesgo: 1');
+                ContR1 := ContR1 + 1;
+                Writeln(arch, '1');
+                end;
+
+            121..159:
                 begin
                 WriteLn('    Nivel de Riesgo: 2');
                 ContR2 := ContR2 + 1;
                 Writeln(arch, '2');
-                end
-            else
+                end;
+
+            160..255:
                 begin
                 WriteLn('    Nivel de Riesgo: 3');
                 ContR3 := ContR3 + 1;
                 Writeln(arch, '3');
                 end;
+        end;
+
+
 
         { CONTADOR CATEGRIA A Y RIESGO 1 }
         if (VelMax > 50) and (pulso <= 120) then
