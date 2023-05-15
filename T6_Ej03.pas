@@ -46,7 +46,6 @@ var
 begin
     repeat
         ClrScr;
-        gotoxy(1,1); //REVISAR SI HACE FALTA!!!
         Write('Ingresar cantidad de posiciones del array {1..50}: ');
         ReadLn(N)
     until (N >= 1) and (N <= 50);
@@ -54,7 +53,6 @@ begin
     for i:=1 to N do
         begin
         ClrScr;
-        gotoxy(1,1); //REVISAR SI HACE FALTA!!!
         Write('Ingresar Entero N° ',i,': ');
         ReadLn(VEnt[i]);
         end;{for}
