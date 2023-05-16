@@ -38,7 +38,7 @@ Ejemplo:
 
 program T6_Ej05;
 //{$codepage UTF8}
-uses crt, SysUtils;
+uses crt;
 
 type
     TV_100_UInt16 = array[1..100] of UInt16; { word }
