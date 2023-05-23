@@ -24,7 +24,7 @@ program T6_Ej16;
 
 //{$codepage UTF8}
 
-uses crt, SysUtils;
+uses crt;
 
 type
     TV_5000_byte = array[1..5000] of Byte; { Para el Vector de Meses de Cumpleaños }
