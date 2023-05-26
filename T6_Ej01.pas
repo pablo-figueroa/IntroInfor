@@ -1,127 +1,197 @@
 (*
------------------------------ EJERCICIO 1 -----------------------------
-    
+----------------------------------------- EJERCICIO 1 -----------------------------------------
+VERSIÓN 2
+
     Ingresar K números que representan montos de ventas de una empresa, 
-ordenados en forma ascendente.
-    
+ordenados en forma ascendente. (Entiendo que los K deben ser ascendentes y no los montos.)
+
+        k Monto
         1 1500
         2 2500
         3 2000
     
-    Calcular y mostrar por pantalla el promedio de los mismos y 
-el % de participación de cada uno respecto de la suma total en forma descendente.
-
+    Calcular y mostrar por pantalla:
+        * El promedio de los mismos y 
+        * El % de participación de cada uno en forma descendente.
+            (Entiendo que los K deben ser descendentes y no los % de participación.)
     
-    IMPORTE TOTAL DE VENTAS  : 6000
-    CANTIDAD TOTAL DE VENTAS :    3
-    PROMEDIO                 : 2000
+    EJEMPLO 1
+        Ventas Ingresadas:
+        [  1100.00  2200.00  3300.00  ]
+        
+        El Promedio de las Ventas es: 2200.00
+        
+        Porcentaje de Participación:
+        [  50.00  33.33  16.67  ]
 
-    Orden |     Venta | Participación
-        3 |   2000.00 |       33.33 %
-        2 |   2500.00 |       41.67 %
-        1 |   1500.00 |       25.00 %
+    EJEMPLO 2
+        Ventas Ingresadas:
+        [  1100.00  2200.00  3300.00  4400.00  5500.00  ]
+        
+        El Promedio de las Ventas es: 3300.00
+        
+        Porcentaje de Participación:
+        [  33.33  26.67  20.00  13.33  6.67  ]
     
-
-Importante :
-    * Cada proceso (lectura, escritura, cálculo) debe ser implementada mediante un procedimiento o
-función, según corresponda, correctamente parametrizada. No utilizar variables globales.
-    * Aunque no se explicite, informar siempre los resultados obtenidos.
-    * Antes de comenzar a hacer el algoritmo arme un ejemplo y resuelva manualmente.
-
-NOTAS DE LA VERSION:
-    Procedimiento único para Suma de Ventas y Promedio.
 *)
 
 program T6_Ej01;
 //{$codepage UTF8}
+
 uses crt;
+
 type
-    TV_50real = array[1..50] of real;
+    TV_50_Real = array[1..50] of real;
+
 
 { INGRESAR LAS VENTAS ------------------------------------------------------------------------}
 procedure LeerVentas
     (
-        var Ventas : TV_50real ;
-        var v      : byte     
+        var V : TV_50_Real; { Ventas   }
+        var N : byte        { Longitud }
     );
 
+var 
+    i     : byte;
+
 begin
-    v := 1;
+    
+    i := 1;
     repeat
         ClrScr;
         gotoxy(1,1);
-        Write('Fin -> 0 | Ingresar Venta N° ',v,': ');
-        ReadLn(Ventas[v]);
-    until (Ventas[v] >= 0);
-
-    while Ventas[v] <> 0 do
+        Write('Fin -> 0 | Ingresar Venta N° ',i,': ');
+        ReadLn(V[i]);
+    until (V[i] >= 0);
+    
+    while V[i] <> 0 do
         begin
-        v := v +1;
+        i := i + 1;
         repeat
             ClrScr;
             gotoxy(1,1);
-            Write('Fin -> 0 | Ingresar Venta N° ',v,': ');
-            ReadLn(Ventas[v]);
-        until (Ventas[v] >= 0);
-    end;{while}
+            Write('Fin -> 0 | Ingresar Venta N° ',i,': ');
+            ReadLn(V[i]);
+        until (V[i] >= 0);
+        end;{while}
+    
+    N := i - 1;
+    { Resto 1 porque no me interesa el 0 que uso para salir del while y se agrega al Vector en eNésima posición }
+    
 end;{procedure}
 
-
-{ SUMA Y PROMEDIO ----------------------------------------------------------------------------}
-procedure SumProm 
+{---------------------------------------------------------------------------------------------}
+procedure MostrarVector
     (
-        Venta         : TV_50real ;
-        v             : byte     ;
-        Var Sum, Prom : real
+        V : TV_50_Real; { Vector   }
+        N : byte        { Longitud }
     );
 
-var i: byte;
+var
+    i : byte;
 
 begin
-    Sum:=0;
-    for i:=1 to (v-1) do
-        Sum := Sum + Venta[i];
-    Prom := Sum / (v-1);
-end;{procedure SumProm}
+    for i:=1 to N do
+        Write(V[i]:0:2,'  ');      { 0 -> No quiero reservar espacios | 2 -> Quiero dos decimales }
+
+end;{ procedure}
 
 
-{ VENTAS Y PARTICIPACION EN EL TOTAL ---------------------------------------------------------}
-procedure VentaPart
+{---------------------------------------------------------------------------------------------}
+function CalcularSuma
     (
-        Ventas : TV_50real ;
-        v      : byte;
-        Sum    : real
+        V : TV_50_Real; { Ventas   }
+        N : byte        { Longitud }
+    ):real;
+
+var 
+    i   : byte;
+    Aux : real;
+
+begin
+    for i:=1 to N do
+        Aux := Aux + V[i];
+
+    CalcularSuma := aux;
+
+end; {function}
+
+
+{---------------------------------------------------------------------------------------------}
+function CalcularPromedio
+    (
+        V  : TV_50_Real;  { Ventas   }
+        N  : byte;        { Longitud }
+        VT : real         { Ventas Totales }
+    ):real;
+
+var
+    i   : byte;
+    Aux : real;
+
+begin
+    Aux := 0;
+    for i:=1 to N do
+        Aux := Aux + V[i];
+
+    CalcularPromedio := Aux / N;
+
+end; {function}
+
+
+{---------------------------------------------------------------------------------------------}
+procedure CalcularParticipacion { en orden descendente }
+    (
+        V      : TV_50_Real;  { Ventas   }
+        N      : byte;        { Longitud }
+        VT     : real;        { Ventas Totales }
+        var VP : TV_50_Real
     );
 
-var i : byte;
+var 
+    i : byte;
 
 begin
-    WriteLn('Orden |     Venta | Participación');
-    for i := (v-1) downto 1 do
+    for i:=1 to N do
         begin
-        WriteLn((v-1):5,' | ',Ventas[v-1]:9:2,' | ',(Ventas[v-1]*100/Sum):11:2,' %');
-        v := v -1;
+        VP[i] := (V[N] / VT) * 100;
+        N := N - 1;
         end;
-end;{procedure VentaPart}
+
+end;{procedure}
 
 
 { PROGRAMA PRINCIPAL -------------------------------------------------------------------------}
 var
-        Ventas : TV_50real ;
-        v      : byte;
-        Sum    : real;
-        Prom   : real;
+        V_Ventas      : TV_50_Real;
+        V_Part        : TV_50_Real; { Participación % }
+        N             : byte;
+        
+        VentasTotales : real;
+        Promedio      : real;
 
-begin
+begin 
     ClrScr;
-    LeerVentas(Ventas,v);
-    SumProm(Ventas, v, Sum, Prom);
-    
+    LeerVentas(V_Ventas, N);
     ClrScr;
-    Writeln('CANTIDAD DE VENTAS : ',(v-1) :9);
-    Writeln('SUMAS DE VENTAS    : ',Sum   :9:2);
-    Writeln('PROMEDIO           : ',Prom  :9:2);
+
     WriteLn;
-    VentaPart(Ventas,v,Sum);
-    ReadLn;
+    WriteLn('Ventas Ingresadas:');
+    Write('[  ');
+    MostrarVector(V_Ventas, N);
+    WriteLn(']');
+    WriteLn;
+    
+    VentasTotales := CalcularSuma(V_Ventas, N);
+    Promedio := VentasTotales / N; { Como que no tendría mucho sentido hacer una función }
+    WriteLn('El Promedio de las Ventas es: ',Promedio:0:2);
+    WriteLn;
+    
+    CalcularParticipacion(V_Ventas, N, VentasTotales, V_Part);
+    
+    WriteLn('Porcentaje de Participación en orden descendente:');
+    Write('[  ');
+    MostrarVector(V_Part, N);
+    WriteLn(']');
+
 end.
