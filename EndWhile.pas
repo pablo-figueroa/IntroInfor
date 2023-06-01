@@ -1,7 +1,7 @@
 (*
----------------------------------- END WHILE ----------------------------------
+---------------------------------- END WHILE HIDE ----------------------------------
 
-PONGAMOSLO A PRUEBA: CON NUMEROS
+PONGAMOSLO A PRUEBA:
 
     Lee un archivo y lo pasa a un vector.
     Buscar mediante una función un valor numérico
@@ -16,8 +16,8 @@ PONGAMOSLO A PRUEBA: CON NUMEROS
 
     Estructura:
         Inicia Serie (Hacer 1.000.000)
-            Tomar tiempo de la Función A (100 repeticiones)
-            Tomar tiempo de la Función B (100 repeticiones)
+            Tomar tiempo de la Función A (100 repeticiones -> Loop)
+            Tomar tiempo de la Función B (100 repeticiones -> Loop)
         Fin de Serie
 *)
 
@@ -40,13 +40,13 @@ type
 procedure Titulo();
 begin
     ClrScr;
-    WriteLn('--------------------------------------------------------');
+    WriteLn('------------------------------------------------------------');
     TextColor(red);
-    WriteLn('                    E N D    W H I L E');
+    WriteLn('                       E N D    W H I L E');
     TextColor(white);
-    WriteLn('--------------------------------------------------------');
+    WriteLn('------------------------------------------------------------');
     TextColor(green);
-    Write('   A = ');
+    Write('        A = ');
     TextColor(yellow);
     Write('while ');
     TextColor(green);
@@ -58,9 +58,9 @@ begin
     TextColor(yellow);
     WriteLn('do');
     TextColor(white);
-    WriteLn('--------------------------------------------------------');
+    WriteLn('------------------------------------------------------------');
     TextColor(cyan);
-    Write('   B = ');
+    Write('        B = ');
     TextColor(yellow);
     Write('while ');
     TextColor(cyan);
@@ -72,7 +72,7 @@ begin
     TextColor(yellow);
     WriteLn('do');
     TextColor(white);
-    WriteLn('--------------------------------------------------------');
+    WriteLn('------------------------------------------------------------');
     WriteLn;
 end; {procedure Titulo}
 
@@ -111,12 +111,12 @@ procedure Separador();
 begin
     WriteLn;
     TextColor(white);
-    WriteLn('--------------------------------------------------------');
+    WriteLn('------------------------------------------------------------');
     WriteLn;
 end;{procedure Separador}
 
 
-{ FUNCTION B -----------------------------------------------------------------}
+{ FUNCTION A -----------------------------------------------------------------}
 function BuscaNumero_A
     (
         V   : TV_UInt16;
@@ -131,7 +131,7 @@ var
 begin
     for Loop:=1 to MaxLoop do
         begin
-        i := 0;
+        i := 1;
         while (V[i] <> num) and (i <= N) do  { ÚNICA DIFERENCIA ENTRE A Y B }
             i := i +1;
         end;
@@ -157,7 +157,7 @@ var
 begin
     for Loop:=1 to MaxLoop do
         begin
-        i := 0;
+        i := 1;
         while (i <= N) and (V[i] <> num) do { ÚNICA DIFERENCIA ENTRE A Y B }
             i := i +1;
         end;
@@ -187,6 +187,11 @@ var { Local Scoope }
     NumTarget    : UInt16; { Número a buscar }
     NumPos       : UInt16; { Posición de Número encontrado }
 
+    fechaHora    : TDateTime;
+    Fecha        : string;
+    Hora         : string;
+    Minutos      : real;
+
     S            :char;
 
 begin
@@ -198,17 +203,19 @@ begin
         Titulo;
 
         LeerVector(VNum, N);
-        WriteLn('Realizará ',MaxSerie,' series de ',FormatFloat('#,###.##',MaxLoop),' ciclos | Num {1 - 1000}');
+        WriteLn('Realizará ',FormatFloat('#,###.##',MaxSerie),' series de ',FormatFloat('#,###.##',MaxLoop),' ciclos | Num {1 - 1000}');
         TextColor(yellow);
         Write('Ingrese un Número Natural -> ');
         ReadLn(numTarget);
         Y := whereY;
-
+        
         gotoxy(1,Y-1);
         ClrEol;
         gotoxy(1,Y-2);
         ClrEol;
 
+        FechaHora := Now;
+        
         for Serie:=1 to MaxSerie do
             begin
 
@@ -219,7 +226,7 @@ begin
             { A -> ACÁ OCURRE LA MAGIA }
             Inicio := GetTickCount64;
             NumPos := BuscaNumero_A(VNum, N, NumTarget);
-            Fin := GetTickCount64;
+            Fin    := GetTickCount64;
             { A -> ALGUNOS CALCULOS }
             Tiempo      := Fin - Inicio;
             TiempoAcumA := TiempoAcumA + Tiempo;
@@ -231,22 +238,28 @@ begin
             { B -> ACÁ OCURRE LA MAGIA }
             Inicio := GetTickCount64;
             NumPos := BuscaNumero_B(VNum, N, NumTarget);
-            Fin := GetTickCount64;
+            Fin    := GetTickCount64;
             { B -> ALGUNOS CALCULOS }
             Tiempo      := Fin - Inicio;
             TiempoAcumB := TiempoAcumB + Tiempo;
             { FIN DE B }
-            
+
             { PRINT -> CONTADOR DE SERIES }
-            TextColor(yellow);
-            write('Serie -> ',FormatFloat('#,###.##',Serie));
+            (* TextColor(yellow);
+            writeLn('Serie -> ',FormatFloat('#,###.##',Serie)); *)
 
             end; {for Serie}
 
         WriteLn;
 
+        { PRINT -> CONTADOR DE SERIES }
+        gotoxy(1,Y-2);
+        ClrEol;
+        
+        TextColor(yellow);
+        writeLn('Serie -> ',FormatFloat('#,###.##',Serie));
         WriteLn('Loop  -> ',FormatFloat('#,###.##',MaxLoop));
-
+        
         Separador;
 
         { PRINT -> POSICION DEL NÚMERO }
@@ -280,11 +293,24 @@ begin
         Separador;
 
         TextColor(green);
-        WriteLn('Tiempo Acumulado de A - > ',tiempoAcumA);
+        Minutos := tiempoAcumA/1000/60;
+        WriteLn('Tiempo Acumulado de A - > ',tiempoAcumA,' | ',Trunc(Minutos),' Minutos y ',Round((Minutos - Trunc(Minutos))*60),' segundos.-');
         WriteLn;
         TextColor(cyan);
-        WriteLn('Tiempo Acumulado de B - > ',tiempoAcumB);
+        Minutos := tiempoAcumB/1000/60;
+        WriteLn('Tiempo Acumulado de B - > ',tiempoAcumB,' | ',Trunc(Minutos),' Minutos y ',Round((Minutos - Trunc(Minutos))*60),' segundos.-');
 
+        Separador;
+
+        Hora := FormatDateTime('hh:nn:ss', FechaHora);
+        WriteLn('Hora Inicio : ', Hora);
+        FechaHora := Now;
+        Hora := FormatDateTime('hh:nn:ss', FechaHora);
+        WriteLn('Hora Fin    : ', Hora);
+        WriteLn;
+        Fecha := FormatDateTime('dd/mm/yyyy', FechaHora);
+        WriteLn('Fecha       : ', Fecha);
+        
         Separador;
 
         { PRINT -> MENU FINAL }
