@@ -136,12 +136,13 @@ begin
     
     for i:=1 to L do
         case VT[i] of
-            1 : VM_Acum[i] := VM_Acum[i] + VM[i];
-            2 : VM_Acum[i] := VM_Acum[i] + VM[i];
-            3 : VM_Acum[i] := VM_Acum[i] + VM[i];
-            4 : VM_Acum[i] := VM_Acum[i] + VM[i];
-            5 : VM_Acum[i] := VM_Acum[i] + VM[i];
+            1 : VM_Acum[1] := VM_Acum[1] + VM[i];
+            2 : VM_Acum[2] := VM_Acum[2] + VM[i];
+            3 : VM_Acum[3] := VM_Acum[3] + VM[i];
+            4 : VM_Acum[4] := VM_Acum[4] + VM[i];
+            5 : VM_Acum[5] := VM_Acum[5] + VM[i];
         end; {case}
+    
 end; 
 
 
@@ -197,7 +198,7 @@ begin
         CalcularMontos(TV_Tipo, TV_Monto, L, VM_Acum);
         CalcularPorcentajes(VM_Acum, V_Porcent, MontoTotal);
         
-        WriteLn('TIPO DE VEHÍCULO              MONTO    PORCENTAJE');
+        WriteLn('TIPO DE VEHÍCULO                 MONTO   PORCENTAJE');
         WriteLn;
         for i:=1 to 5 do
             WriteLn(' ',TV_Taller[i]);
@@ -207,11 +208,11 @@ begin
         for i:=1 to 5 do
             begin
             GotoXY(25,Y);
-            Writeln(' : ',TV_Monto[i]:8:2,'      ',V_Porcent[i]:5:2,' %');
+            Writeln(' : ',FormatFloat('$#,###,###.00',VM_Acum[i]):11,'      ',V_Porcent[i]:5:2,' %');
             Y := Y + 1;
             end;
         WriteLn;
-        WriteLn('MONTO TOTAL: ',MontoTotal:8:2);
+        WriteLn('MONTO TOTAL: ',FormatFloat('$#,###,###.00',MontoTotal));
 
         Separador;
         
