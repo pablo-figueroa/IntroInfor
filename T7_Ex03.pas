@@ -257,7 +257,10 @@ begin
     TextColor(green);
     Write('  Arreglo B -> ');
     
-    MostrarVector(Vector, P);
+    if P = 0 then
+        WriteLn('Ningún elemento cumple: Vacío.')
+    else    
+        MostrarVector(Vector, P);
     TextColor(white);
 
     Separador;
