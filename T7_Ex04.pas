@@ -83,7 +83,6 @@ end;{procedure}
 procedure LeerMatriz (
     var Mat : TM;
     var Vec : TV;
-    N       : byte;
     var M   : byte
 );
 
@@ -110,7 +109,6 @@ end;
 {---------------------------------------------------------------------------------------}
 procedure MostrarMatriz (
     Mat : TM;
-    N   : byte;
     M   : byte
 );
 
@@ -140,8 +138,7 @@ end;
 
 {---------------------------------------------------------------------------------------}
 procedure LeerVector (
-    var V : TV;
-    N     : byte
+    var V : TV
 );
 
 var
@@ -159,8 +156,7 @@ end;
 
 {---------------------------------------------------------------------------------------}
 procedure MostrarVector (
-    V : TV;
-    N : byte
+    V : TV
 );
 
 var
@@ -177,7 +173,6 @@ end;
 {---------------------------------------------------------------------------------------}
 procedure MatrizTraspuesta (
     Mat      : TM;
-    N        : byte;
     M        : byte;
     var MatT : TM
     
@@ -204,7 +199,6 @@ end;
 {---------------------------------------------------------------------------------------}
 procedure MostrarMatrizTrasp (
     MatT : TM;
-    N   : byte;
     M   : byte
 );
 
@@ -214,10 +208,10 @@ var
     aux : byte;
 
 begin
-    for i:=1 to N do
+    for i:=1 to M do
         begin
         write('  | ');
-        for j:=1 to M do
+        for j:=1 to N do
             if i = 1 then
                 begin
                 aux := Round(MatT[i,j]);
@@ -236,7 +230,6 @@ end;
 { a. Cuantos fueron los meses en los cuales todos los empleados superaron el objetivo }
 function MesesGetObj (
     MatT : TM;
-    N    : byte;
     M    : byte;
     V    : TV
 ):byte;
@@ -276,7 +269,6 @@ end;
 { b. Dado un número de empleado (1..N) cuantos meses no cumplió el objetivo }
 function EmpNotGetObj (
     MatT : TM;
-    N    : byte;
     M    : byte;
     V    : TV;
     NumE : byte
@@ -317,31 +309,31 @@ var
     EmpNoObj : byte;
 
 begin
-    LeerMatriz(Mat, Vec, N, M);
+    LeerMatriz(Mat, Vec, M);
     ClrScr;
 
     WriteLn('Registro de Ventas: ');
     Writeln;
     WriteLn('  Fila -> Mes | Columna -> Venta');
     Writeln;
-    MostrarMatriz(Mat, N, M);
+    MostrarMatriz(Mat, M);
 
     Separador;
 
-    MatrizTraspuesta(Mat, N, M, MatT);
-    MostrarMatrizTrasp(MatT, M, N);
+    MatrizTraspuesta(Mat, M, MatT);
+    MostrarMatrizTrasp(MatT, M);
 
-    LeerVector(Vector, N);
+    LeerVector(Vector);
     Writeln;
     TextColor(yellow);
     WriteLn('Objetivos Mensuales: ');
     TextColor(white);
     
-    MostrarVector(Vector, N);
+    MostrarVector(Vector);
     
     Separador;
 
-    MesesObj := MesesGetObj(MatT,N,M,Vector);
+    MesesObj := MesesGetObj(MatT,M,Vector);
     WriteLn('Meses que todos alcanzaron el objetivo: ',MesesObj);
 
     Separador;
@@ -351,7 +343,7 @@ begin
         ReadLn(NumE);
     until (NumE >= 1) and (NumE <= M-1);
 
-    EmpNoObj := EmpNotGetObj(MatT,N,M,Vector,NumE);
+    EmpNoObj := EmpNotGetObj(MatT,M,Vector,NumE);
     WriteLn;
     WriteLn('Cantidad de Meses que NO cumplió el objetivo: ',EmpNoObj);
 
