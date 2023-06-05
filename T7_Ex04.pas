@@ -56,11 +56,11 @@ Objetivos Mensuales:
     
 *)
 
-program T7_Ex02;
+program T7_Ex04;
 
 //{$codepage UTF8}
 
-uses crt, SysUtils;
+uses crt;
 
 type
     TM = array[1..10,1..10] of real;
@@ -127,7 +127,9 @@ begin
             if j = 1 then
                 begin
                 aux := Round(Mat[i,j]);
+                TextColor(yellow);
                 Write(Meses[aux]);
+                TextColor(white);
                 end
             else    
                 write(Mat[i,j]:9:2);
@@ -219,7 +221,9 @@ begin
             if i = 1 then
                 begin
                 aux := Round(MatT[i,j]);
+                TextColor(yellow);
                 Write(Meses[aux]:9);
+                TextColor(white);
                 end
             else    
                 write(MatT[i,j]:9:2);
@@ -329,7 +333,9 @@ begin
 
     LeerVector(Vector, N);
     Writeln;
+    TextColor(yellow);
     WriteLn('Objetivos Mensuales: ');
+    TextColor(white);
     
     MostrarVector(Vector, N);
     
