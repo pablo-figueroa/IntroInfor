@@ -1,59 +1,18 @@
 (*
 EJERCICIO 4
+Version KISS
 
-Se han registrado las ventas mensuales de cada uno de N empleados en el último semestre. 
+Se han registrado las ventas mensuales de cada uno de M empleados en el último semestre. 
 Cada mes se ha establecido un objetivo de importe de ventas a cumplir. 
 
-Se pide leer la información en una matriz de 6x N real y un vector de 6 elementos reales, 
-luego calcular e informar:
+Se pide leer la información desde un archivo el cual consta:
+    * en la primer línea un número que indica la cantidad de EMPLEADOS
+    * desde la segunda línea: una matriz de 6xM real, en la cual el último vector, de 6 elementos reales, es referente a los objetivos.
 
+Calcular e informar:
     a. Cuantos fueron los meses en los cuales todos los empleados superaron el objetivo
     b. Dado un número de empleado (1..N) cuantos meses no cumplió el objetivo
 
-    
-    Leer de una matriz 6xN
-      Hacer la traspuesta
-    
-    Matriz Nx6
-      N:filas:empleados
-      M:col:meses
-
-    vector[1..6] objetivos mensuales
-
-    EJEMPLO:
-
-    Archivo/Matriz de entrada: (6xN {N=3})
-    
-    4 -> indica la cantidad de columnas
-    12 4900.00	5000.00 5100.00
-    1  4600.00	4700.00 4800.00
-    2  4500.00	4600.00 4700.00
-    3  4400.00	4500.00 4600.00
-    4  4300.00	4400.00 4500.00
-    5  4200.00	4300.00 4400.00
-
-            Primera Columna indica el Mes
-            Segunda Columna indica Empleado 1
-            Tercera Columna indica Empleado 2
-            M       Columna indica Empleado M-1
-
-    Matriz Traspuesta: (3x6)
-  |       Dic      Ene      Feb      Mar      Abr      May  |
-  |   4900.00  4600.00  4500.00  4400.00  4300.00  4200.00  |
-  |   5000.00  4700.00  4600.00  4500.00  4400.00  4300.00  |
-  |   5100.00  4800.00  4700.00  4600.00  4500.00  4400.00  |
-
-Objetivos Mensuales: 
-  |   4999.00  4500.00  4450.00  4450.00  4450.00  4500.00  |
-    
-    a. Cuantos fueron los meses en los cuales todos los empleados superaron el objetivo
-    Meses -> 2
-
-    b. Dado un número de empleado (1..N) cuantos meses no cumplió el objetivo
-    E1 -> 4
-    E2 -> 2
-    E3 -> 1
-    
 *)
 
 program T7_Ex04;
@@ -63,13 +22,12 @@ program T7_Ex04;
 uses crt;
 
 type
-    TM = array[1..10,1..10] of real;
-    TV = array[1..6] of real; { Objetivos }
-    TVStr = array[1..12] of String[3]; { Objetivos }
+    TM = array[1..50,1..50] of real;
 
 const
-    N : byte = 6;
-    Meses : TVStr = ('Ene', 'Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic');
+    N : byte = 6; { es dato que el tamaño de filas de la Matriz es 6 }
+    
+
 {---------------------------------------------------------------------------------------}
 procedure Separador();
 begin
@@ -80,9 +38,9 @@ end;{procedure}
 
 
 {---------------------------------------------------------------------------------------}
-procedure LeerMatriz (
+{ Leer Archivo y Generar Matriz }
+procedure LeeArchGenMat (
     var Mat : TM;
-    var Vec : TV;
     var M   : byte
 );
 
@@ -92,13 +50,13 @@ var
     arch : text;
 
 begin
-    Assign(arch, 'T7_Ex04.txt');
+    Assign(arch, 'T7_Ex04_KISS.txt');
     Reset(arch);
     ReadLn(arch, M);
     
     for i:=1 to N do
         begin
-        for j:=1 to M do
+        for j:=1 to M+1 do          { M col de Emplados + 1 col de Objetivos}
             read(arch, Mat[i,j]);
         ReadLn(arch);
         end;
@@ -115,237 +73,195 @@ procedure MostrarMatriz (
 var
     i : byte;
     j : byte;
-    aux : byte;
 
 begin
     for i:=1 to N do
         begin
-        write('  | ');
-        for j:=1 to M do
-            if j = 1 then
-                begin
-                aux := Round(Mat[i,j]);
-                TextColor(yellow);
-                Write(Meses[aux]);
-                TextColor(white);
-                end
+        write('Mes: ',i,'  | ');
+        for j:=1 to M+1 do
+            if j <= M then
+                write(Mat[i,j]:9:2)
             else    
+                begin
+                TextColor(yellow);
                 write(Mat[i,j]:9:2);
-        WriteLn('  |');
-        end;
-end;
-
-
-{---------------------------------------------------------------------------------------}
-procedure LeerVector (
-    var V : TV
-);
-
-var
-    i : byte;
-    arch : text;
-
-begin
-    Assign(arch, 'T7_Ex04_Objetivos.txt');
-    Reset(arch);
-    for i:=1 to N do
-        read(arch, V[i]);
-    Close(arch);
-end;
-
-
-{---------------------------------------------------------------------------------------}
-procedure MostrarVector (
-    V : TV
-);
-
-var
-    i : byte;
-
-begin
-    write('  | ');
-    for i:=1 to N do
-        write(V[i]:9:2);
-    WriteLn('  |');    
-end;
-
-
-{---------------------------------------------------------------------------------------}
-procedure MatrizTraspuesta (
-    Mat      : TM;
-    M        : byte;
-    var MatT : TM
-    
-);
-
-var
-    i,j : byte;
-    k,l : byte;
-
-begin
-    l := 0;
-    for i:=1 to N do
-        begin
-        l := l +1;
-        k := 0;
-        for j:=1 to M do
-            begin
-            k := k + 1;
-            MatT[k,l] := Mat[i,j];
-            end;
-        end;
-end;
-
-{---------------------------------------------------------------------------------------}
-procedure MostrarMatrizTrasp (
-    MatT : TM;
-    M   : byte
-);
-
-var
-    i : byte;
-    j : byte;
-    aux : byte;
-
-begin
-    for i:=1 to M do
-        begin
-        write('  | ');
-        for j:=1 to N do
-            if i = 1 then
-                begin
-                aux := Round(MatT[i,j]);
-                TextColor(yellow);
-                Write(Meses[aux]:9);
                 TextColor(white);
-                end
-            else    
-                write(MatT[i,j]:9:2);
+                end;
         WriteLn('  |');
         end;
 end;
 
 
 {---------------------------------------------------------------------------------------}
-{ a. Cuantos fueron los meses en los cuales todos los empleados superaron el objetivo }
-function MesesGetObj (
-    MatT : TM;
-    M    : byte;
-    V    : TV
+{ a. Cuantos fueron los meses en los cuales todos los empleados SUPERARON el objetivo }
+
+{ IMPORTANTE! OJO CON LA UBICACIÓN DE LA FUNCIÓN SECUNDARIA!!! }
+{ a.2 - Función Secundaria }
+function SuperaObj(
+    Mat :TM; 
+    Mes :byte;
+    M   :byte 
+):boolean;
+
+var j : byte;
+
+begin
+    SuperaObj := False;
+    j := 1;
+    while (j <= M) and (Mat[Mes,j] > Mat[Mes,M+1]) do { M-1 pq la última col es de los Objetivos de Vtas. }
+        j := j + 1;
+    if j > M then
+        SuperaObj := True;
+end;
+
+{---------------------------------------------------}
+{ a.1 - Función Primaria }
+function CantMeses (
+    Mat : TM; 
+    M   : byte
 ):byte;
 
-var
-    i,j : byte;
-    Supera : byte; { Supera el Objetivo }
-    TodosS : byte; { Todos superan el objetivo }
+var 
+    i, Cont : byte;
 
 begin
-    TodosS := 0;
-    for j:=1 to N do
-        begin
-        Supera := 0;
-        for i:=2 to M do
-            
-            begin
+    Cont := 0;
+    for i:=1 to 6 do
+        if SuperaObj(Mat, i, M) then 
+            Cont := Cont +1;
 
-            if MatT[i,j] > V[j] then
-                Supera := Supera + 1;
-            { Ver que sucede... }
-            (* Writeln('i: ',i,' j: ',j,' MatT: ',MatT[i,j]:0:2,' | j: ',j,' Vec: ',V[j]:0:2,' | Supera = ',Supera); *)
-            end;
-          
-        if (Supera = (M-1)) then
-            TodosS := TodosS + 1;
-        { Ver que sucede... }
-        (* WriteLn('Supera: ',Supera,' | TodosS = ',TodosS);
-        WriteLn; *)
-        
-        end;
-    MesesGetObj := TodosS;    
+    CantMeses := Cont;
 end;
 
 
 {---------------------------------------------------------------------------------------}
-{ b. Dado un número de empleado (1..N) cuantos meses no cumplió el objetivo }
-function EmpNotGetObj (
-    MatT : TM;
+{ b. Dado un número de empleado (1..N) cuantos meses no CUMPLIÓ el objetivo }
+{ Dice "cumplió", no dice "superó" }
+function CantNoCumple (
+    Mat  : TM;
     M    : byte;
-    V    : TV;
     NumE : byte
 ):byte;
 
 var
-    j : byte;
-    Supera : byte; { Supera el Objetivo }
+    i           : byte;
+    NoCumpleObj : byte; { NO Cumple el Objetivo }
 
 begin
-    NumE := NumE + 1;
-    Supera := 0;
-    for j:=1 to N do
+    NoCumpleObj := 0;
+    for i:=1 to N do
         begin
-        if MatT[NumE,j] > V[j] then
-            Supera := Supera + 1;    
-        
-        { Ver que sucede... }
-        (* WriteLn('NumE: ',NumE,' j: ',j,' MatT: ',MatT[NumE,j]:0:2,' VS V[j]: ', V[j]:0:2,' | Supera = ',Supera); *)
-        
+        if Mat[i,NumE] < Mat[i,M+1] then { CUMPLE si Vtas >= Objetivo | NO CUMPLE si Ventas < Objetivo }
+            NoCumpleObj := NoCumpleObj + 1;    
         end;
-    EmpNotGetObj := N - Supera;
+    CantNoCumple := NoCumpleObj;
 end;
+
+
+{---------------------------------------------------------------------------------------}
+{ b. Dado un número de empleado (1..N) cuantos meses no CUMPLIÓ el objetivo }
+{ MOSTRAR LA COMPARACIÓN }
+procedure MostrarComparacion (
+    Mat  : TM;
+    M    : byte;
+    NumE : byte
+);
+
+var
+    i           : byte;
+
+begin
+    for i:=1 to N do
+        begin
+        if Mat[i,NumE] < Mat[i,M+1] then { CUMPLE si Vtas >= Objetivo | NO CUMPLE si Ventas < Objetivo }
+            begin
+            TextColor(red);
+            Write('  ',Mat[i,NumE]:8:2,' vs ');
+            end
+        else
+            begin
+            TextColor(green);
+            Write('  ',Mat[i,NumE]:8:2,' vs ');
+            end;
+        TextColor(yellow);
+        Writeln(Mat[i,M+1]:8:2);
+        end;
+    TextColor(white);
+end;
+
+{---------------------------------------------------------------------------------------}
+{ Limpiar pantalla entre Y1 y Y2 }
+procedure ClrYY (
+    Y1, Y2 : byte
+);
+
+var i : byte;
+
+begin
+    for i:=Y2-Y1+1 downto 0 do
+        begin
+        gotoxy(1,Y1+i);
+        ClrEOL;
+        end;
+end;
+
 
 
 {---------------------------------------------------------------------------------------}
 {PROGRAMA PRINCIPAL}
 var
     Mat  : TM;
-    MatT : TM;
-    Vec  : TV;
     M    : byte;
+    NumE : byte;
 
-    Vector : TV;
-    
-    MesesObj : byte;
-    NumE     : byte;
-    EmpNoObj : byte;
+    Y1 : byte; { Ubicación y en la pantalla }
+    Y2 : byte; { Ubicación y en la pantalla }
+    S : char; { para salir }
 
 begin
-    LeerMatriz(Mat, Vec, M);
     ClrScr;
+    LeeArchGenMat(Mat, M);
 
     WriteLn('Registro de Ventas: ');
     Writeln;
-    WriteLn('  Fila -> Mes | Columna -> Venta');
+    Write('        | Ventas y ');
+    TextColor(yellow);
+    Writeln('Objetivos Mensuales');
+    TextColor(white);
     Writeln;
     MostrarMatriz(Mat, M);
 
     Separador;
 
-    MatrizTraspuesta(Mat, M, MatT);
-    MostrarMatrizTrasp(MatT, M);
-
-    LeerVector(Vector);
-    Writeln;
-    TextColor(yellow);
-    WriteLn('Objetivos Mensuales: ');
-    TextColor(white);
-    
-    MostrarVector(Vector);
-    
-    Separador;
-
-    MesesObj := MesesGetObj(MatT,M,Vector);
-    WriteLn('Meses que todos alcanzaron el objetivo: ',MesesObj);
+    WriteLn('Meses que todos alcanzaron el objetivo: ',CantMeses(Mat, M));
 
     Separador;
 
+    Y1 := WhereY;
+    
     repeat
-        Write('Ingrese un número de empleado (1..',M-1,'): ');
-        ReadLn(NumE);
-    until (NumE >= 1) and (NumE <= M-1);
+        repeat
+            Write('Ingrese un número de empleado (1..',M,'): ');
+            ReadLn(NumE);
+        until (NumE >= 1) and (NumE <= M);
+    
+        WriteLn;
+        WriteLn('  Cantidad de meses que NO CUMPLIÓ el objetivo: ',CantNoCumple(Mat, M, NumE));
+        WriteLn;
+        MostrarComparacion(Mat, M, NumE);
+        
+        Separador;
+        TextColor(red);
+        Write('ENTER -> Repite | S -> Sale : ');
+        TextColor(white);
+        Read(S);
+        S := UpCase(S);
+        
+        Y2 := WhereY;
+        if S <> 'S' then
+            ClrYY(Y1,Y2);
 
-    EmpNoObj := EmpNotGetObj(MatT,M,Vector,NumE);
-    WriteLn;
-    WriteLn('Cantidad de Meses que NO cumplió el objetivo: ',EmpNoObj);
+    until S = 'S';
 
     Separador;
 
