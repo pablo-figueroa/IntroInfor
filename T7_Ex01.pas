@@ -29,7 +29,7 @@ EJEMPLO:
 
 program T7_Ex01;
 
-{$codepage UTF8}
+//{$codepage UTF8}
 
 uses crt;
 
@@ -163,17 +163,17 @@ procedure IntercambiarFilas (
 
 var
     j : byte;
-    Aux : TM;
+    Aux : integer;
 
 begin
         for j:=1 to M do
-            Aux[K,j] := Mx[K,j];
+            Aux := Mx[K,j];
 
         for j:=1 to M do
             Mx[K,j] := Mx[H,j];
 
         for j:=1 to M do
-            Mx[H,j] := Aux[k,j];
+            Mx[H,j] := Aux;
 end;
 
 
