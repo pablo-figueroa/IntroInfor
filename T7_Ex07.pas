@@ -21,7 +21,7 @@ y edificios de cualquier cantidad de pisos (considerar un máximo de 100 pisos)?
 
 *)
 
-program T7_Ex04;
+program T7_Ex07;
 
 //{$codepage UTF8}
 
