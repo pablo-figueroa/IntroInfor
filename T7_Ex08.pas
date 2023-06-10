@@ -276,7 +276,7 @@ var
     ColourC : byte; { c. Cantidad de columnas de un solo color }
     
 
-begin readln;
+begin
     ClrScr;
     TextColor(red);
     WriteLn('SUPUESTO: No me dan la dimensión de la Matriz.');
