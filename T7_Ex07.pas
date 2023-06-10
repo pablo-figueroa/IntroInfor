@@ -28,267 +28,290 @@ program T7_Ex04;
 uses crt;
 
 type
-    TM = array[1..300,1..3] of byte;
-
-const
-    M : byte = 3;
+    TM = array[1..31,1..100] of byte;
+    TV = array[1..100] of real;
 
 
 {---------------------------------------------------------------------------------------}
 procedure Separador();
 begin
     WriteLn;
-    WriteLn('-------------------------------------------------------------');
+    WriteLn('---------------------------------------------------------------------------------------');
     WriteLn;
 end;{procedure}
 
 
 {---------------------------------------------------------------------------------------}
-procedure LeerMatriz (
-    var Mat : TM;
-    var N   : word
+{ Limpiar pantalla entre Y1 y Y2 }
+procedure ClrYY (
+    Y1, Y2 : byte
+);
+
+var i : byte;
+
+begin
+    for i:=Y2-Y1+1 downto 0 do
+        begin
+        gotoxy(1,Y1+i);
+        ClrEOL;
+        end;
+end;
+
+
+{---------------------------------------------------------------------------------------}
+procedure IniciaMat(var Mat : TM);
+
+var i,j : byte;
+
+begin
+    for i:= 1 to 31 do
+        for j:= 1 to 25 do
+            Mat[i,j] := 0;
+
+end;
+
+
+
+{---------------------------------------------------------------------------------------}
+{ Averiguar el día máximo y piso máximo }
+procedure MaximoDiaPiso (
+    var MaxDia  : byte;
+    var MaxPiso : byte
 );
 
 var
-    i    : word;
-    j    : byte;
+    arch    : text;
+    AuxDia  : byte;
+    AuxPiso : byte;
+
+begin
+    MaxDia  := 0;
+    MaxPiso := 0;
+    Assign(arch, 'T7_Ex07.txt');
+    Reset(arch);
+    
+    while not eof(arch) do
+        begin
+        readLn(arch, AuxDia, AuxPiso);
+        if AuxDia > MaxDia then
+            MaxDia := AuxDia;
+        
+        if AuxPiso > MaxPiso then
+            MaxPiso := AuxPiso;
+        end;
+end;
+
+
+{---------------------------------------------------------------------------------------}
+{ Inicializar en 0 la Matriz Acumulativa }
+procedure IniciaMatriz (
+    Mat     : TM;
+    DiaMax  : byte;
+    PisoMax : byte
+);
+
+var
+    i,j : byte;
+
+begin
+    for i := 1 to DiaMax do
+        for j:= 1 to PisoMax do
+            Mat[i,j] := 0;
+end;
+
+
+{---------------------------------------------------------------------------------------}
+{ Leer Archivo y Generar Matriz }
+procedure LeeArchGenMat (
+    var Mat : TM
+);
+
+var 
+    dia,piso,pers : byte;
     arch : text;
 
 begin
     Assign(arch, 'T7_Ex07.txt');
     Reset(arch);
-    i := 0;
+
     while not eof(arch) do
         begin
-        i := i + 1;
-        for j:=1 to M do
-            read(arch, Mat[i,j]);
-        ReadLn(arch);
+        ReadLn(arch, dia,piso,pers);
+        Mat[dia,piso] := Mat[dia,piso] + pers;
         end;
+        
     Close(arch);
-    N := i;
-end;
-
-
-{---------------------------------------------------------------------------------------}
-procedure MostrarMatriz (
-    Mat : TM;
-    N   : word
-);
-
-var
-    i : word;
-    j : byte;
-
-begin
-    for i:=1 to N do
-        begin
-        write('  | ');
-        for j:=1 to M do
-            write(Mat[i,j]:4);
-        WriteLn('  |');
-        end;
-end;
-
-
-{---------------------------------------------------------------------------------------}
-function MaxDia (
-    Mat : TM;
-    N   : word
-):byte;
-
-var
-    i   : word;
-    j   : byte;
-    Max : byte;
-
-begin
-    Max := 0;
-    for i:=1 to N do
-        for j:= 1 to 1 do
-            if Mat[i,j] > Max then
-                Max := Mat[i,j];
-    MaxDia := Max;
-end;
-
-
-{---------------------------------------------------------------------------------------}
-function MaxPiso (
-    Mat : TM;
-    N   : word
-):byte;
-
-var
-    i   : word;
-    j   : byte;
-    Max : byte;
-
-begin
-    Max := 0;
-    for i:=1 to N do
-        for j:= 2 to 2 do
-            if Mat[i,j] > Max then
-                Max := Mat[i,j];
-    MaxPiso := Max;
 end;
 
 
 {---------------------------------------------------------------------------------------}
 { a. Para CADA PISO Y CADA DÍA, la cantidad de personas que ingresaron. }
-function PisoDiaPersonas (
+
+procedure MostrarMatriz (
     Mat     : TM;
-    N       : word;
-    Storey  : byte;
-    Day     : byte
-):byte;   
-                                             {Día, Piso y Cantidad}
-var
-    i    : word;
-    Acum : byte;
-
-begin
-    Acum := 0;
-    for i:=1 to N do
-        if (Mat[i,1] = Day) and (Mat[i,2] = Storey) then
-            Acum := Acum + Mat[i,3];
-    
-    PisoDiaPersonas := Acum;        
-end;
-
-
-
-{---------------------------------------------------------------------------------------}
-{ a1. Para CADA PISO, la cantidad de personas que ingresaron. }
-procedure PisoPersonas (
-    Mat     : TM;
-    N       : word;
+    DiaMax  : byte;
     PisoMax : byte
 );
 
 var
-    i     : word;
-    Piso  : byte;
-    Acum  : byte;
-    Total : word;
+    i,j : byte;
+
+begin
+    { Escribir el piso }
+    TextColor(yellow);
+    Write(' Piso -> ');
+    for j:=1 to PisoMax do
+        write(j:3);
+    Writeln;
+    TextColor(white);
+    { ---------------- }
     
-
-begin
-    Total := 0;
-    for Piso:=1 to PisoMax do
+    for i:=1 to DiaMax do
         begin
-        Acum := 0;
-        write('Piso: ',Piso:2);
-        for i:= 1 to N do
-            if (Mat[i,2] = Piso) then
-                Acum := Acum + Mat[i,3];
-        WriteLn(' | Personas: ',Acum);
-        Total := Total + Acum;
+        TextColor(yellow);
+        write('Día: ',i:2,' |');
+        TextColor(white);
+        for j:=1 to PisoMax do
+            begin
+            if Mat[i,j] > 0 then
+                begin
+                TextColor(green);
+                write(Mat[i,j]:3);
+                TextColor(white);
+                end
+            else 
+                write(Mat[i,j]:3);
+            end;
+        TextColor(yellow);
+        WriteLn('  |');
+        TextColor(white);
         end;
-    WriteLn('Total Personas: ',Total);
-end;
-
-{---------------------------------------------------------------------------------------}
-{ a2. Para CADA DÍA, la cantidad de personas que ingresaron. }
-procedure DiaPersonas (
-    Mat    : TM;
-    N      : word;
-    DiaMax : byte
-);   
-
-var
-    i     : word;
-    Dia   : byte;
-    Acum  : byte;
-    Total : word;
-
-begin
-    Total := 0;
-    for Dia:=1 to DiaMax do
-        begin
-        Acum := 0;
-        write('Dia: ',Dia:2);
-        for i:= 1 to N do
-            if (Mat[i,1] = Dia) then
-                Acum := Acum + Mat[i,3];
-        WriteLn(' | Personas: ',Acum);
-        Total := Total + Acum;
-        end;
-    WriteLn('Total Personas: ',Total);
 end;
 
 
 {---------------------------------------------------------------------------------------}
 { b. Cantidad total de personas ingresadas al edificio durante el mes. }
 function TotalPersonas (
-    Mat : TM; 
-    N   : word
+    Mat     : TM;
+    DiaMax  : byte;
+    PisoMax : byte
 ):word;
 
 var
-    i   : word;
+    i,j : byte;
     Aux : word;
 
 begin
     Aux := 0;
-    for i:=1 to N do
-        Aux := Aux + Mat[i,3];
+    for i:=1 to DiaMax do
+        for j:=1 to PisoMax do
+            Aux := Aux + Mat[i,j];
     
     TotalPersonas := Aux;
 end;
 
-
 {---------------------------------------------------------------------------------------}
 { c. Promedio diario de personas que ingresaron a cada piso. }
+{ c.1 -> Función que es llamada por el Procedimiento Promedio Diario}
+function SumaPersonasByPiso (
+    Mat    : TM;
+    MaxDia : byte;
+    Piso   : byte
+): word;
+
+var
+    i : byte;
+    Suma : word;
+
+begin
+    Suma := 0;
+    for i:= 1 to MaxDia do
+        Suma := Suma + Mat[i,Piso];
+    
+    SumaPersonasByPiso := Suma;
+end;
+
+
+
+{-------------------------------}
+{ c.2 -> }
 procedure PromedioDiario (
-    Mat     : TM; 
-    N       : word;
-    DiaMax  : byte;
+    Mat         : TM; 
+    DiaMax      : byte;
+    PisoMax     : byte;
+    var VecProm : TV { La longitud del Vector de Promedios es igual a PisoMax }
+);
+
+var
+    Piso : byte;
+    
+
+begin
+    for Piso:=1 to PisoMax do
+        VecProm[Piso] := SumaPersonasByPiso(Mat, DiaMax, Piso)/DiaMax;
+
+    
+end;
+
+{-------------------------------}
+{ c.3 -> }
+
+procedure MostrarVector (
+    VecProm : TV;
     PisoMax : byte
 );
 
 var
-    i     : word;
-    Piso  : byte;
-    Acum  : byte;
-    Total : real;
+    j : byte;
 
 begin
-    for Piso:=1 to PisoMax do
+    for j:=1 to PisoMax do
         begin
-        Acum := 0;
-        write('  Piso: ',Piso:2,' -> ');
-        for i:= 1 to N do
-            if (Mat[i,2] = Piso) then
-                Acum := Acum + Mat[i,3];
-        WriteLn('Promedio Diario = (',Acum,' / ',DiaMax,') = ',Acum/DiaMax:5:2);
-        Total := Total + Acum;
+        write('Piso ',j:2,' :',VecProm[j]:5:2,'     ');
+        if j mod 4 = 0 then
+            begin
+            WriteLn;
+            if TextAttr = 15 then
+                TextColor(yellow)
+            else
+                TextColor(white);
+            end;
         end;
-    WriteLn;
-    WriteLn('PROMEDIO DIARIO TOTAL -> ',Total/DiaMax:5:2);
 end;
 
 
 {---------------------------------------------------------------------------------------}
 {d. Para un determinado día, el porcentaje de personas que ingresaron dicho día 
 sobre el total del mes.}
-function Porcentaje (
-    Mat    : TM;
-    N      : word;
-    Day    : byte;
-    TotalP : word
-):real;   
+{ d.1 }
+function SumarPersonasByDay (
+    Mat     : TM;
+    MaxPiso : byte;
+    Day     : byte
+): word;
 
 var
-    i    : word;
-    Acum : byte;
+    j : byte;
+    Aux : word;
 
 begin
-    Acum := 0;
-    for i:=1 to N do
-        if (Mat[i,1] = Day) then
-            Acum := Acum + Mat[i,3];
+    Aux := 0;
+    for j:= 1 to MaxPiso do
+        Aux := Aux + Mat[Day,j];
     
-    Porcentaje := Acum*100/TotalP;
+    SumarPersonasByDay := Aux;
+end;
+
+{ d.2 --------------------------------}
+function PorcentajePorDia (
+    Mat     : TM;
+    MaxPiso : byte;
+    Day     : byte;
+    TotalP  : word
+):real;   
+
+begin
+    PorcentajePorDia := (SumarPersonasByDay(Mat, MaxPiso, Day) / TotalP) * 100;
 end;
 
 
@@ -296,94 +319,91 @@ end;
 {PROGRAMA PRINCIPAL}
 var
     Mat      : TM;
-    N        : word;
 
     DiaMax   : byte;
     PisoMax  : byte;
 
-    Storey   : byte;
-    Day      : byte;
-    Personas : byte;
-    S        : char;
-
     TotalP   : word;
-    Porc     : real;
+    
+    VecProm : TV;
 
-    Y        : byte;
+    Day      : byte;
+
+    S        : char;
+    Y1 : word; { Ubicación y en la pantalla }
+    Y2 : word; { Ubicación y en la pantalla }
 
 begin
-    LeerMatriz(Mat, N);
     ClrScr;
 
-    (* WriteLn('Matriz Ingresada: ');
-    Writeln;
-    MostrarMatriz(Mat, N); *)
+    { Averiguar Día Máximo y Piso Máximo }
+    MaximoDiaPiso(DiaMax, PisoMax);
 
-    DiaMax := MaxDia(Mat, N);
-    PisoMax := MaxPiso(Mat, N);
+    { Inicializar en 0 la Matriz Acumulativa }
+    IniciaMatriz(Mat, DiaMax, PisoMax);
+
+    { Leer Archivo y Generar Matriz Acumulativa }
+    LeeArchGenMat(Mat);
     
-    (* Separador;
-    WriteLn('Máximo de días  : ',diaMax:3);
-    WriteLn('Máximo de Pisos : ',PisoMax:3); *)
-
-    repeat
-        ClrScr;
-        WriteLn('Cantidad de Personas que ingresaron por piso y por día');
-        
-        repeat
-        Write(' Ingrese Piso (1-',PisoMax,'): ');
-        ReadLn(Storey);
-        until (Storey >= 1) and (Storey <= PisoMax);
-
-        repeat
-            Write(' Ingrese Día  (1-',DiaMax,'): ');
-            ReadLn(Day);
-        until (Day >= 1) and (Day <= DiaMax);
-        
-        Personas := PisoDiaPersonas(Mat, N, Storey, Day);
-
-        writeLn;
-        WriteLn(' Ingresaron ',Personas,' personas.-');
-        WriteLn;
-        Write('ENTER -> Seguir | Salir -> "S" : ');
-        Read(S);
-        S := UpCase(S);
-    until S = 'S';
-
-    (* Separador;
-    PisoPersonas(Mat, N, PisoMax);
-    Separador;
-    DiaPersonas(Mat, N, DiaMax); *)
-    
-    Separador;
-
-    TotalP := TotalPersonas(Mat, N);
-    WriteLn('Total de personas: ',TotalP);
-    
-    Separador;
-
-    WriteLn('Promedio Diario de personas que ingresaron a cada piso:');
+    { a. Para cada piso y cada día, la cantidad de personas que ingresaron. }
+    TextColor(cyan);
+    WriteLn('a. Para cada piso y cada día, la cantidad de personas que ingresaron.');
+    TextColor(white);
     WriteLn;
-    PromedioDiario(Mat, N, DiaMax, PisoMax);
+    MostrarMatriz(Mat, DiaMax, PisoMax);
+    WriteLn;
+    TextColor(red);
+    Write('Al dar ENTER se quitará visualización de la Matriz... ');
+    TextColor(white);
+    ReadLn;
+    ClrScr;
+
+    
+    { b. Cantidad total de personas ingresadas al edificio durante el mes. }
+    TotalP := TotalPersonas(Mat, DiaMax, PisoMax);
+    TextColor(cyan);
+    WriteLn('b. Cantidad total de personas ingresadas al edificio durante el mes: ',TotalP);
+    TextColor(white);
+
+    Separador;
+    
+    { c. Promedio diario de personas que ingresaron a cada piso. }
+    TextColor(cyan);
+    WriteLn('c. Promedio diario de personas que ingresaron a cada piso.');
+    TextColor(white);
+    WriteLn;
+    PromedioDiario(Mat, DiaMax, PisoMax, VecProm);
+    MostrarVector(VecProm, PisoMax);
 
     Separador;
 
-    WriteLn('Para un determinado día el porcentaje de personas.');
+    { d. Para un determinado día, el porcentaje de personas que ingresaron dicho día sobre el total del mes. }
+    TextColor(cyan);
+    WriteLn('d. Para un determinado día el porcentaje de personas.');
+    TextColor(white);
     WriteLn;
+    Y1 := WhereY;
     repeat
         repeat
+            gotoxy(1,y1);
+            clrEOL;
             Write(' Ingrese Día (1-',DiaMax,') : ');
             ReadLn(Day);
         until (Day >= 1) and (Day <= DiaMax);
         
-        Porc := Porcentaje(Mat, N, Day, TotalP);
-        
-        WriteLn(' Porcentaje         : ',Porc:0:2,' %');
+        WriteLn(' Porcentaje         : ',PorcentajePorDia(Mat, PisoMax, Day, TotalP):0:2,' %');
         WriteLn;
+    
+        TextColor(red);
         Write('ENTER -> Seguir | Salir -> "S" : ');
+        TextColor(white);
         Read(S);
-        WriteLn;
+        Y2 := WhereY;
+        
         S := UpCase(S);
+        if S <> 'S' then
+                ClrYY(Y1,Y2);
+    
     until S = 'S';
 
     Separador;
