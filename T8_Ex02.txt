@@ -1,0 +1,17 @@
+Abel      95.25 96.00
+Benjamin  97.75 73.75
+Charles   76.00 66.50
+David     77.25 67.00
+Ethan     81.25 94.25
+Gabriel   80.00 95.00
+Henry     82.50 95.50
+Isaac     67.50 86.75
+Jacob     87.50 66.25
+James     68.75 88.00
+John      82.50 75.75
+Lucas     84.75 76.00
+Nathan    69.75 92.50
+Oliver    85.00 71.00
+Peter     64.50 88.25
+Samuel    95.00 74.00
+Thomas    89.50 65.75
