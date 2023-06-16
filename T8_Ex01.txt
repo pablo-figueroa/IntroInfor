@@ -1,0 +1,20 @@
+Matias
+28 90 1.75
+Javier
+32 70 1.80
+Tomas
+19 65 1.70
+Lourdes
+20 45 1.58
+Camila
+23 58 1.63
+Sofia
+25 65 1.60
+Nahuel
+33 76 1.85
+Gabriel
+36 66 1.74
+Marlene
+30 55 1.61
+David
+21 50 1.71
