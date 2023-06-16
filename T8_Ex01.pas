@@ -1,7 +1,7 @@
 (*
 
-    Se tiene en un archivo ‘Pacientes.TXT’ los siguientes datos: 
-Nombre, edad, peso y altura.
+    Se tiene en un archivo 'Pacientes.TXT' -> 'T8_Ex01.txt'
+    los siguientes datos: Nombre, edad, peso y altura.
 
     Se pide leer la información, calcular e informar:
         a) El nombre del paciente más joven,
